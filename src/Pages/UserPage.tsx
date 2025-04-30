@@ -3,6 +3,7 @@ import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
 import { format } from "date-fns"
+import { useRef } from "react"
 
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -33,9 +34,26 @@ export default function UserPage() {
 
   const selectedDate = watch("data")
 
+  const cpfRef = useRef<HTMLInputElement>(null)
+  const emailRef = useRef<HTMLInputElement>(null)
+  const calendarRef = useRef<HTMLDivElement>(null)
+
   const onSubmit = (data: FormValues) => {
     console.log("Formulário enviado:", data)
   }
+
+  const handleKeyDown = (
+    e: React.KeyboardEvent<HTMLInputElement>,
+    nextRef: React.RefObject<HTMLElement>
+  ) => {
+    if (e.key === "Enter") {
+      e.preventDefault()
+      if (nextRef.current instanceof HTMLElement) {
+        nextRef.current.focus()
+      }
+    }
+  }
+  
 
   return (
     <form
@@ -47,24 +65,39 @@ export default function UserPage() {
       <div className="space-y-4">
         <div>
           <Label htmlFor="nome">Nome</Label>
-          <Input id="nome" {...register("nome")} />
+          <Input
+            id="nome"
+            {...register("nome")}
+            onKeyDown={(e) => handleKeyDown(e, cpfRef)}
+          />
           {errors.nome && <p className="text-sm text-red-500">{errors.nome.message}</p>}
         </div>
 
         <div>
           <Label htmlFor="cpf">CPF</Label>
-          <Input id="cpf" {...register("cpf")} />
+          <Input
+            id="cpf"
+            {...register("cpf")}
+            ref={cpfRef}
+            onKeyDown={(e) => handleKeyDown(e, emailRef)}
+          />
           {errors.cpf && <p className="text-sm text-red-500">{errors.cpf.message}</p>}
         </div>
 
         <div>
           <Label htmlFor="email">Email</Label>
-          <Input id="email" type="email" {...register("email")} />
+          <Input
+            id="email"
+            type="email"
+            {...register("email")}
+            ref={emailRef}
+            onKeyDown={(e) => handleKeyDown(e, calendarRef)}
+          />
           {errors.email && <p className="text-sm text-red-500">{errors.email.message}</p>}
         </div>
       </div>
 
-      <div className="pt-4">
+      <div className="pt-4" ref={calendarRef}>
         <Label>Selecione uma data</Label>
         <Calendar
           mode="single"
