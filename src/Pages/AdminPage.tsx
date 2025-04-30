@@ -1,50 +1,58 @@
 // src/pages/AdminPage.tsx
-import { useState } from "react"
-import { format } from "date-fns"
-import { Calendar } from "@/components/ui/calendar"
-import { Label } from "@/components/ui/label"
-import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
+
+import { Card, CardContent } from "@/components/ui/card";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Button } from "@/components/ui/button";
 
 export default function AdminPage() {
-  const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date())
+  const agendamentos = [
+    {
+      id: 1,
+      nome: "João Silva",
+      cpf: "123.456.789-00",
+      email: "joao@email.com",
+      data: "05/05/2025",
+    },
+    {
+      id: 2,
+      nome: "Maria Oliveira",
+      cpf: "987.654.321-00",
+      email: "maria@email.com",
+      data: "06/05/2025",
+    },
+  ];
 
   return (
-    <div className="max-w-5xl mx-auto p-6 space-y-6">
-      <h1 className="text-3xl font-bold text-[#d4542c] text-center">Painel do Gestor</h1>
-
-      <div className="flex flex-col md:flex-row md:items-end gap-4">
-        <div className="flex-1">
-          <Label htmlFor="colaborador">Buscar por Colaborador</Label>
-          <Input id="colaborador" placeholder="Nome do colaborador" />
-        </div>
-
-        <div className="flex-1">
-          <Label>Filtrar por data</Label>
-          <Calendar
-            mode="single"
-            selected={selectedDate}
-            onSelect={setSelectedDate}
-            className="border rounded-md mt-2"
-          />
-        </div>
-
-        <div className="mt-4">
-          <Button className="bg-[#d4542c] hover:bg-[#ec6040] text-white">
-            Filtrar
-          </Button>
-        </div>
-      </div>
-
-      {/* Lista de agendamentos simulada */}
-      <div className="mt-6">
-        <h2 className="text-xl font-semibold mb-2">Agendamentos</h2>
-        <div className="border rounded-md p-4 space-y-2 bg-white shadow-sm">
-          <p><strong>Nome:</strong> João da Silva</p>
-          <p><strong>Data:</strong> {format(new Date(), "dd/MM/yyyy")}</p>
-          <p><strong>Colaborador:</strong> Maria</p>
-        </div>
-      </div>
+    <div className="max-w-5xl mx-auto p-6">
+      <h1 className="text-3xl font-bold text-center text-[#d4542c] mb-6">Painel do Administrador</h1>
+      <Card>
+        <CardContent className="p-4">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Nome</TableHead>
+                <TableHead>CPF</TableHead>
+                <TableHead>Email</TableHead>
+                <TableHead>Data</TableHead>
+                <TableHead>Ações</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {agendamentos.map((item) => (
+                <TableRow key={item.id}>
+                  <TableCell>{item.nome}</TableCell>
+                  <TableCell>{item.cpf}</TableCell>
+                  <TableCell>{item.email}</TableCell>
+                  <TableCell>{item.data}</TableCell>
+                  <TableCell>
+                    <Button variant="outline" size="sm">Ver</Button>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
     </div>
-  )
+  );
 }
