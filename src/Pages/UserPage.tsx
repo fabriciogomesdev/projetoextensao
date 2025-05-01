@@ -3,11 +3,12 @@ import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
 import { format } from "date-fns"
-import { useRef } from "react"
+import { useEffect, useRef, useState } from "react"
 
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Calendar } from "@/components/ui/calendar"
+import { QRCodeCanvas } from "qrcode.react"
 
 const formSchema = z.object({
   nome: z.string().min(1, "Nome é obrigatório"),
@@ -34,26 +35,34 @@ export default function UserPage() {
 
   const selectedDate = watch("data")
 
+  // Referências para navegação entre campos
+  const nomeRef = useRef<HTMLInputElement>(null)
   const cpfRef = useRef<HTMLInputElement>(null)
   const emailRef = useRef<HTMLInputElement>(null)
   const calendarRef = useRef<HTMLDivElement>(null)
 
+  const [formData, setFormData] = useState<FormValues | null>(null)
+
   const onSubmit = (data: FormValues) => {
     console.log("Formulário enviado:", data)
+    setFormData(data)
   }
 
   const handleKeyDown = (
     e: React.KeyboardEvent<HTMLInputElement>,
-    nextRef: React.RefObject<HTMLElement>
+    nextRef: React.RefObject<HTMLElement | null>
   ) => {
     if (e.key === "Enter") {
       e.preventDefault()
-      if (nextRef.current instanceof HTMLElement) {
-        nextRef.current.focus()
-      }
+      nextRef.current?.focus()
     }
   }
-  
+
+
+  // Foco automático no campo de nome ao carregar a página
+  useEffect(() => {
+    nomeRef.current?.focus()
+  }, [])
 
   return (
     <form
@@ -68,6 +77,7 @@ export default function UserPage() {
           <Input
             id="nome"
             {...register("nome")}
+            ref={nomeRef}
             onKeyDown={(e) => handleKeyDown(e, cpfRef)}
           />
           {errors.nome && <p className="text-sm text-red-500">{errors.nome.message}</p>}
@@ -97,7 +107,7 @@ export default function UserPage() {
         </div>
       </div>
 
-      <div className="pt-4" ref={calendarRef}>
+      <div className="pt-4" ref={calendarRef} tabIndex={-1}>
         <Label>Selecione uma data</Label>
         <Calendar
           mode="single"
@@ -121,6 +131,20 @@ export default function UserPage() {
       >
         Agendar
       </button>
+
+      {formData && (
+        <div className="pt-6 text-center">
+          <p className="mb-2 font-medium">QR Code do Agendamento:</p>
+          <QRCodeCanvas
+            value={JSON.stringify(formData)}
+            size={180}
+            bgColor="#ffffff"
+            fgColor="#000000"
+            level="H"
+            includeMargin
+          />
+        </div>
+      )}
     </form>
   )
 }
